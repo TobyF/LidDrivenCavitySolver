@@ -5,7 +5,7 @@ using namespace std;
 #include "LidDrivenCavity.h"
 
 int main(int argc, char* argv[])
-{   
+{
 	MPI_Init(&argc, &argv); //Init MPI
 
 	//Get rank and overall size
@@ -14,11 +14,17 @@ int main(int argc, char* argv[])
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 
 	//Display a message from each process
-	cout << "Yo! I am a process and my rank is:" << rank <<"/" << size << endl;
+	cout << "Yo! I am a process and my rank is:" << rank <<" of the " << size << endl;
 
 	MPI_Comm domain_grid; //Define a communicator for the grid
 	const int dims = 2; //Working on a 2D flow
 	int sizes[dims] = {4,4}; //Needs to be changed by the arguments
+
+	if ((sizes[0]*sizes[1]) != size) {
+		if (rank==0)cout << "No. of processes does not match domain allocation (n != Ny * Nx)" << endl;
+		return 1;
+	}
+
 	int periods[dims] = {0,0};
 	int reorder = 1;
 	int coords[dims];
