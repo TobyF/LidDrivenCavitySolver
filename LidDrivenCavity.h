@@ -6,8 +6,8 @@ using namespace std;
 class LidDrivenCavity
 {
 public:
-    LidDrivenCavity();
-    ~LidDrivenCavity();
+    LidDrivenCavity(); //Constructor
+    ~LidDrivenCavity(); //Destructor
 
     void SetDomainSize(double xlen, double ylen);
     void SetGridSize(int nx, int ny);

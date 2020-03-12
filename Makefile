@@ -8,5 +8,5 @@ LidDrivenCavitySolver.o: LidDrivenCavitySolver.cpp
 LidDrivenCavity.o: LidDrivenCavity.cpp
 	mpicxx LidDrivenCavity.o LidDrivenCavity.cpp
 
-ldcs: LidDrivenCavitySolver.o LidDrivenCavity.o
-	mpicxx -o ldcs LidDrivenCavitySolver.o LidDrivenCavity.o
+ldcs: LidDrivenCavitySolver.cpp LidDrivenCavity.cpp
+	mpicxx -o ldcs LidDrivenCavitySolver.cpp LidDrivenCavity.cpp
