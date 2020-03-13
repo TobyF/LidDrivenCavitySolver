@@ -55,7 +55,16 @@ int main(int argc, char* argv[])
 	const double dt = vm["dt"].as<double>();
 	const double T = vm["T"].as<double>();
 	const double Re = vm["Re"].as<double>();
+	const double dx = cavity_size[0]/global_grid_points[0];
+	const double dy = cavity_size[1]/global_grid_points[1];
 
+	// Validate dt
+	if (dt > Re*dx*dy/4){
+		cout << "dt too large for Re and number of points - change dt < Re*dx*dy/4" << endl;
+		MPI_Finalize();
+		return 1;
+	}
+	
 	//Initialise MPI
 	MPI_Init(&argc, &argv); //Init MPI
 
@@ -73,6 +82,7 @@ int main(int argc, char* argv[])
 
 	if ((sub_domains[0]*sub_domains[1]) != process_count) {
 		if (global_rank==0)cout << "No. of processes does not match domain allocation (n != Py * Px)" << endl;
+		MPI_Finalize();
 		return 1;
 	}
 
@@ -92,14 +102,14 @@ int main(int argc, char* argv[])
 
 	//for (int i = 0; i<4; i++) cout << neighbours[i] << endl;
 
-	// Calculate gridding
+	// Calculate gridding - tries to evenely distribute grid points.
 	int grid_points[dims];
 
 	// Get base points
 	grid_points[0] = global_grid_points[0]/sub_domains[0];
 	grid_points[1] = global_grid_points[1]/sub_domains[1];
 
-	// Top up to account for any 'remainers'
+	// Top up with any 'remainers'
 	if (global_grid_points[0]%sub_domains[0] > grid_rank) grid_points[0]++;
 	if (global_grid_points[1]%sub_domains[1] > grid_rank) grid_points[1]++;
 
