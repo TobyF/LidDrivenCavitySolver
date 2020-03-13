@@ -1,11 +1,45 @@
 #include <iostream>
+
+//Multi-Process Interface
 #include <mpi.h>
+
 using namespace std;
 
+//Allows program options to be read from cmd line
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
+
+//User written class
 #include "LidDrivenCavity.h"
 
 int main(int argc, char* argv[])
 {
+	//Get command line arguments
+	po::options_description desc("Allowed options");
+  desc.add_options()
+      ("help", "Produce help message")
+			("Lx", po::value<int>(), "Length of the domain in the x-direction.")
+			("Ly", po::value<int>(), "Length of the domain in the y-direction.")
+      ("Nx", po::value<int>(), "Number of grid points in x-direction.")
+			("Ny", po::value<int>(), "Number of grid points in y-direction.")
+			("Px", po::value<int>(), "Number of partitions in the x-direction. (parallel)")
+			("Py", po::value<int>(), "Number of partitions in the y-direction. (parallel)")
+			("dt", po::value<int>(), "Time step size.")
+			("T", po::value<int>(), "Final time.")
+			("Re", po::value<int>(), "Reynolds number.")
+
+  ;
+
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, desc), vm);
+  po::notify(vm);
+
+  if (vm.count("help")) {
+      cout << desc << "\n";
+      return 0;
+  }
+
+	//Initialise MPI
 	MPI_Init(&argc, &argv); //Init MPI
 
 	//Get rank and overall size
