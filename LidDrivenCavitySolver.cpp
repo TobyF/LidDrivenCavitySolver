@@ -24,9 +24,9 @@ int main(int argc, char* argv[])
 			("Ny", po::value<int>()->default_value(16), "Number of grid points in y-direction.")
 			("Px", po::value<int>()->default_value(4), "Number of partitions in the x-direction. (parallel)")
 			("Py", po::value<int>()->default_value(4), "Number of partitions in the y-direction. (parallel)")
-			("dt", po::value<double>()->default_value(0.1), "Time step process_count.")
+			("dt", po::value<double>()->default_value(0.01), "Time step process_count.")
 			("T", po::value<double>()->default_value(10), "Final time.")
-			("Re", po::value<double>()->default_value(1), "Reynolds number.")
+			("Re", po::value<double>()->default_value(1000), "Reynolds number.")
 
   ;
 
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 		MPI_Finalize();
 		return 1;
 	}
-	
+
 	//Initialise MPI
 	MPI_Init(&argc, &argv); //Init MPI
 
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 	MPI_Comm_size(MPI_COMM_WORLD, &process_count);
 
 	//Display a message from each process
-	cout << "Yo! I am a process and my global rank is:" << global_rank <<" of the " << process_count << endl;
+	//cout << "Yo! I am a process and my global rank is:" << global_rank <<" of the " << process_count << endl;
 
 	// Sort out grid and parallelisms
 
@@ -113,10 +113,13 @@ int main(int argc, char* argv[])
 	if (global_grid_points[0]%sub_domains[0] > grid_rank) grid_points[0]++;
 	if (global_grid_points[1]%sub_domains[1] > grid_rank) grid_points[1]++;
 
-	cout << "(Rank" << grid_rank << ") I have " << grid_points[0] << "x points and " << grid_points[1] << "y points" << endl;
+	cout << "(Rank" << grid_rank << ") I have " << grid_points[0] << "x points and " << grid_points[1] << "y points" << ",my coords are:" << coords[0] << coords[1] << " my neighbours are:" << neighbours[0] << neighbours[1] << neighbours[2] << neighbours[3] << endl;
 
 	// Create a new instance of the LidDrivenCavity class
-	LidDrivenCavity* solver = new LidDrivenCavity();
+	LidDrivenCavity* solver = new LidDrivenCavity(domain_grid, grid_rank, neighbours, grid_points, dx, dy, dt, T, Re);
+
+	// Print test
+	solver->Test();
 
 	// Configure the solver here...
 	solver->Initialise();
