@@ -18,15 +18,15 @@ int main(int argc, char* argv[])
 	po::options_description desc("Allowed options");
   desc.add_options()
       ("help", "Produce help message")
-			("Lx", po::value<int>()->default_value(1), "Length of the domain in the x-direction.")
-			("Ly", po::value<int>()->default_value(1), "Length of the domain in the y-direction.")
+			("Lx", po::value<double>()->default_value(1), "Length of the domain in the x-direction.")
+			("Ly", po::value<double>()->default_value(1), "Length of the domain in the y-direction.")
       ("Nx", po::value<int>()->default_value(16), "Number of grid points in x-direction.")
 			("Ny", po::value<int>()->default_value(16), "Number of grid points in y-direction.")
 			("Px", po::value<int>()->default_value(4), "Number of partitions in the x-direction. (parallel)")
 			("Py", po::value<int>()->default_value(4), "Number of partitions in the y-direction. (parallel)")
-			("dt", po::value<int>()->default_value(0.1), "Time step size.")
-			("T", po::value<int>()->default_value(10), "Final time.")
-			("Re", po::value<int>()->default_value(1), "Reynolds number.")
+			("dt", po::value<double>()->default_value(0.1), "Time step process_count.")
+			("T", po::value<double>()->default_value(10), "Final time.")
+			("Re", po::value<double>()->default_value(1), "Reynolds number.")
 
   ;
 
@@ -38,24 +38,34 @@ int main(int argc, char* argv[])
       cout << desc << "\n";
       return 0;
   }
+	// Initialise sim parameters
+	const int dims = 2; //Working on a 2D flow
+	double cavity_size[dims];
+	int grid_points[dims], sub_domains[dims];
+
+	// Load arguments into variables.
+	cavity_size[0] = vm["Lx"].as<double>();
+	cavity_size[1] = vm["Ly"].as<double>();
+ 	grid_points[0] = vm["Nx"].as<int>();
+	grid_points[1] = vm["Ny"].as<int>();
+	sub_domains[0] = vm["Px"].as<int>();
+	sub_domains[1] = vm["Py"].as<int>();
 
 	//Initialise MPI
 	MPI_Init(&argc, &argv); //Init MPI
 
-	//Get rank and overall size
-	int rank, size;
+	//Get rank and overall process_count
+	int rank, process_count;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	MPI_Comm_size(MPI_COMM_WORLD, &process_count);
 
 	//Display a message from each process
-	cout << "Yo! I am a process and my rank is:" << rank <<" of the " << size << endl;
+	cout << "Yo! I am a process and my rank is:" << rank <<" of the " << process_count << endl;
 
 	MPI_Comm domain_grid; //Define a communicator for the grid
-	const int dims = 2; //Working on a 2D flow
-	int sizes[dims] = {4,4}; //Needs to be changed by the arguments
 
-	if ((sizes[0]*sizes[1]) != size) {
-		if (rank==0)cout << "No. of processes does not match domain allocation (n != Ny * Nx)" << endl;
+	if ((sub_domains[0]*sub_domains[1]) != process_count) {
+		if (rank==0)cout << "No. of processes does not match domain allocation (n != Py * Px)" << endl;
 		return 1;
 	}
 
@@ -63,7 +73,7 @@ int main(int argc, char* argv[])
 	int reorder = 1;
 	int coords[dims];
 	int grid_rank;
-	MPI_Cart_create(MPI_COMM_WORLD, dims, sizes, periods, reorder, &domain_grid); //Create a cartesian grid
+	MPI_Cart_create(MPI_COMM_WORLD, dims, sub_domains, periods, reorder, &domain_grid); //Create a cartesian grid
 	MPI_Comm_rank(domain_grid, &grid_rank);
 	MPI_Cart_coords(domain_grid, grid_rank, dims, coords);
 
