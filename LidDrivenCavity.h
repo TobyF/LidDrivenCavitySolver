@@ -24,9 +24,6 @@ public:
     // Add any other public functions
 
 private:
-    double* v = nullptr;
-    double* s = nullptr;
-
     double dt;
     double dy;
     double dx;
@@ -40,4 +37,11 @@ private:
     int rank;
     MPI_Comm grid_comm;
     int grid_size[2];
+    double* v = nullptr;
+    double* s = nullptr;
+    double* s_new = nullptr;
+    double* v_new = nullptr;
+    double* u_vel = nullptr;
+    double* v_vel = nullptr;
+
 };
