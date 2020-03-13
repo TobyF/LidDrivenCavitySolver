@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
 	const double dt = vm["dt"].as<double>();
 	const double T = vm["T"].as<double>();
 	const double Re = vm["Re"].as<double>();
-	const double dx = cavity_size[0]/global_grid_points[0];
-	const double dy = cavity_size[1]/global_grid_points[1];
+	const double dx = cavity_size[0]/(global_grid_points[0]-1);
+	const double dy = cavity_size[1]/(global_grid_points[1]-1);
 
 	// Validate dt
 	if (dt > Re*dx*dy/4){
