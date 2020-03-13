@@ -41,13 +41,13 @@ int main(int argc, char* argv[])
 	// Initialise domain parameters
 	const int dims = 2; //Working on a 2D flow
 	double cavity_size[dims];
-	int grid_points[dims], sub_domains[dims];
+	int global_grid_points[dims], sub_domains[dims];
 
 	// Assign domain parameters.
 	cavity_size[0] = vm["Lx"].as<double>();
 	cavity_size[1] = vm["Ly"].as<double>();
- 	grid_points[0] = vm["Nx"].as<int>();
-	grid_points[1] = vm["Ny"].as<int>();
+ 	global_grid_points[0] = vm["Nx"].as<int>();
+	global_grid_points[1] = vm["Ny"].as<int>();
 	sub_domains[0] = vm["Px"].as<int>();
 	sub_domains[1] = vm["Py"].as<int>();
 
@@ -60,38 +60,59 @@ int main(int argc, char* argv[])
 	MPI_Init(&argc, &argv); //Init MPI
 
 	//Get rank and overall process_count
-	int rank, process_count;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	int global_rank, process_count;
+	MPI_Comm_rank(MPI_COMM_WORLD, &global_rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &process_count);
 
 	//Display a message from each process
-	cout << "Yo! I am a process and my rank is:" << rank <<" of the " << process_count << endl;
+	cout << "Yo! I am a process and my global rank is:" << global_rank <<" of the " << process_count << endl;
+
+	// Sort out grid and parallelisms
 
 	MPI_Comm domain_grid; //Define a communicator for the grid
 
 	if ((sub_domains[0]*sub_domains[1]) != process_count) {
-		if (rank==0)cout << "No. of processes does not match domain allocation (n != Py * Px)" << endl;
+		if (global_rank==0)cout << "No. of processes does not match domain allocation (n != Py * Px)" << endl;
 		return 1;
 	}
 
-	int periods[dims] = {0,0};
-	int reorder = 1;
+	int periods[dims] = {0,0}; //Dont allow any wrap-around
+	int reorder = 1; //Allow re-ordering
 	int coords[dims];
 	int grid_rank;
 	MPI_Cart_create(MPI_COMM_WORLD, dims, sub_domains, periods, reorder, &domain_grid); //Create a cartesian grid
-	MPI_Comm_rank(domain_grid, &grid_rank);
-	MPI_Cart_coords(domain_grid, grid_rank, dims, coords);
+	MPI_Comm_rank(domain_grid, &grid_rank); //Get rank in grid
+	MPI_Cart_coords(domain_grid, grid_rank, dims, coords); //Get coordinated n grid
 
-	cout << "I live at coords:" << coords << endl;
+	//cout << "I am rank" << grid_rank <<" and I live at coords:" << coords[0] << coords[1] << endl;
 
-   	 // Create a new instance of the LidDrivenCavity class
-    	LidDrivenCavity* solver = new LidDrivenCavity();
+	int neighbours[4] = {grid_rank, grid_rank, grid_rank, grid_rank};
+  MPI_Cart_shift(domain_grid, 0, 1, &neighbours[0], &neighbours[1]);
+  MPI_Cart_shift(domain_grid, 1, 1, &neighbours[2], &neighbours[3]);
 
-    	// Configure the solver here...
-    	solver->Initialise();
+	//for (int i = 0; i<4; i++) cout << neighbours[i] << endl;
 
-   	 // Run the solver
-    	solver->Integrate();
+	// Calculate gridding
+	int grid_points[dims];
+
+	// Get base points
+	grid_points[0] = global_grid_points[0]/sub_domains[0];
+	grid_points[1] = global_grid_points[1]/sub_domains[1];
+
+	// Top up to account for any 'remainers'
+	if (global_grid_points[0]%sub_domains[0] > grid_rank) grid_points[0]++;
+	if (global_grid_points[1]%sub_domains[1] > grid_rank) grid_points[1]++;
+
+	cout << "(Rank" << grid_rank << ") I have " << grid_points[0] << "x points and " << grid_points[1] << "y points" << endl;
+
+	// Create a new instance of the LidDrivenCavity class
+	LidDrivenCavity* solver = new LidDrivenCavity();
+
+	// Configure the solver here...
+	solver->Initialise();
+
+	 // Run the solver
+	solver->Integrate();
 
 
 	MPI_Finalize();
