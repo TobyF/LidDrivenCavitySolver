@@ -38,18 +38,23 @@ int main(int argc, char* argv[])
       cout << desc << "\n";
       return 0;
   }
-	// Initialise sim parameters
+	// Initialise domain parameters
 	const int dims = 2; //Working on a 2D flow
 	double cavity_size[dims];
 	int grid_points[dims], sub_domains[dims];
 
-	// Load arguments into variables.
+	// Assign domain parameters.
 	cavity_size[0] = vm["Lx"].as<double>();
 	cavity_size[1] = vm["Ly"].as<double>();
  	grid_points[0] = vm["Nx"].as<int>();
 	grid_points[1] = vm["Ny"].as<int>();
 	sub_domains[0] = vm["Px"].as<int>();
 	sub_domains[1] = vm["Py"].as<int>();
+
+	// Load sim parameters
+	const double dt = vm["dt"].as<double>();
+	const double T = vm["T"].as<double>();
+	const double Re = vm["Re"].as<double>();
 
 	//Initialise MPI
 	MPI_Init(&argc, &argv); //Init MPI
