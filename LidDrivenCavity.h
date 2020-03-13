@@ -3,6 +3,8 @@
 #include <string>
 #include <iostream>
 #include <mpi.h>
+#include <cmath>
+
 using namespace std;
 
 class LidDrivenCavity

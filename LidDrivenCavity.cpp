@@ -14,6 +14,9 @@ LidDrivenCavity::LidDrivenCavity(MPI_Comm grid_comm, int rank, int neighbours[4]
   this -> grid_size[0] = grid_size[0];
   this -> grid_size[1] = grid_size[1];
 
+  this -> Nx = grid_size[0];
+  this -> Ny = grid_size[1];
+
   this -> dx = dx;
 
   this -> dy = dy;
@@ -57,13 +60,25 @@ void LidDrivenCavity::SetReynoldsNumber(double re)
 
 void LidDrivenCavity::Initialise()
 {
-  //Create flow grid of stream functions, vorticitys and velocitys.
+  //Create flow grid of stream functions, vorticitys and velocitys. COULD BE MOVED TO constructor
   this -> s = new double[grid_size[0]*grid_size[1]];
   this -> s_new = new double[grid_size[0]*grid_size[1]];
   this -> v = new double[grid_size[0]*grid_size[1]];
   this -> v_new = new double[grid_size[0]*grid_size[1]];
   this -> u_vel = new double[grid_size[0]*grid_size[1]];
   this -> v_vel = new double[grid_size[0]*grid_size[1]];
+
+
+  // Set boundary conditions:
+  // If this set of points has a boundary on an edge
+  // set the boundary points as per the first equation step.
+  int i;
+  if (neighbours[0] == -2){
+    for (i=0;i<Ny;i++){
+      v[i*Ny] = (s[i*Ny]-s[i*Ny+1])*2/(pow(dy,2));
+    }
+  }
+
 }
 
 void LidDrivenCavity::Integrate()
