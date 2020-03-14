@@ -1,0 +1,9 @@
+*.o
+*.d
+*.txt
+*.project
+*.mk
+ldcs
+myprog
+**/debug
+**/Debug
