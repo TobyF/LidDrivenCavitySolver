@@ -27,6 +27,8 @@ LidDrivenCavity::LidDrivenCavity(MPI_Comm grid_comm, int rank, int neighbours[4]
 
   this -> Re = Re;
 
+  this -> U = 1;
+
 }
 
 LidDrivenCavity::~LidDrivenCavity()

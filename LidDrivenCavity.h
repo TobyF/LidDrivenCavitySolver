@@ -45,5 +45,6 @@ private:
     double* v_new = nullptr;
     double* u_vel = nullptr;
     double* v_vel = nullptr;
+    double U;
 
 };
