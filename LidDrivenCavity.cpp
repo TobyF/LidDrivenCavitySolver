@@ -74,13 +74,32 @@ void LidDrivenCavity::Initialise()
   // Set boundary conditions:
   // If this set of points has a boundary on an edge
   // set the boundary points as per the first equation step.
+
+  // Top
   int i;
-  if (neighbours[0] == -2){
-    for (i=0;i<Ny;i++){
-      v[i*Ny] = (s[i*Ny]-s[i*Ny+1])*2/(pow(dy,2));
+  if (neighbours[0] == -2){ //Top boundary
+    for (i=1;i<=Nx;i++){
+      v[i*Ny-1] = (s[i*Ny-1]-s[i*Ny-2])*2/pow(dy,2) - 2*U/dy;
     }
   }
-
+  // Bottom
+  if (neighbours[1] == -2){
+    for (i=0;i<Nx;i++){
+      v[Ny*i] = (s[Ny*i] - s[Ny*i+1])*2/pow(dy,2);
+    }
+  }
+  // Left
+  if (neighbours[2] == -2){
+    for (i=0;i<Ny;i++){
+      v[i] = (s[i] - s[Ny+i])*2/pow(dx,2);
+    }
+  }
+  // Right
+  if (neighbours[2] == -2){
+    for (i=0;i<Nx;i++){
+      v[i] = (s[i] - s[Ny+i])*2/pow(dx,2);
+    }
+  }
 }
 
 void LidDrivenCavity::Integrate()
