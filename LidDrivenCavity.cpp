@@ -63,12 +63,12 @@ void LidDrivenCavity::SetReynoldsNumber(double re)
 void LidDrivenCavity::Initialise()
 {
   //Create flow grid of stream functions, vorticitys and velocitys. COULD BE MOVED TO constructor
-  this -> s = new double[grid_size[0]*grid_size[1]];
-  this -> s_new = new double[grid_size[0]*grid_size[1]];
-  this -> v = new double[grid_size[0]*grid_size[1]];
-  this -> v_new = new double[grid_size[0]*grid_size[1]];
-  this -> u_vel = new double[grid_size[0]*grid_size[1]];
-  this -> v_vel = new double[grid_size[0]*grid_size[1]];
+  this -> s = new double[Nx*Ny];
+  this -> s_new = new double[Nx*Ny];
+  this -> v = new double[Nx*Ny];
+  this -> v_new = new double[Nx*Ny];
+  this -> u_vel = new double[Nx*Ny];
+  this -> v_vel = new double[Nx*Ny];
 }
 
 void LidDrivenCavity::UpdateBoundaryConditions()
@@ -117,5 +117,8 @@ void LidDrivenCavity::CalculateInteriorVorticity(){
 
 void LidDrivenCavity::Integrate()
 {
+  UpdateBoundaryConditions();
+
+  CalculateInteriorVorticity();
 
 }
