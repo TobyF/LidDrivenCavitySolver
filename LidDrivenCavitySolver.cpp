@@ -110,10 +110,8 @@ int main(int argc, char* argv[])
 	grid_points[1] = global_grid_points[1]/sub_domains[1];
 
 	// Top up with any 'remainers'
-	if (global_grid_points[0]%sub_domains[0] > grid_rank) grid_points[0]++;
-	if (global_grid_points[1]%sub_domains[1] > grid_rank) grid_points[1]++;
-
-	cout << "(Rank" << grid_rank << ") I have " << grid_points[0] << "x points and " << grid_points[1] << "y points" << ",my coords are:" << coords[0] << coords[1] << " my neighbours are:" << neighbours[0] << neighbours[1] << neighbours[2] << neighbours[3] << endl;
+	if (global_grid_points[0]%sub_domains[0] > coords[0]) grid_points[0]++;
+	if (global_grid_points[1]%sub_domains[1] > coords[1]) grid_points[1]++;
 
 	// Create a new instance of the LidDrivenCavity class
 	LidDrivenCavity* solver = new LidDrivenCavity(domain_grid, grid_rank, neighbours, grid_points, dx, dy, dt, T, Re);

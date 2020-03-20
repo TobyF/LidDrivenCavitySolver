@@ -11,11 +11,19 @@ LidDrivenCavity::LidDrivenCavity(MPI_Comm grid_comm, int rank, int neighbours[4]
   this -> neighbours[2] = neighbours[2];
   this -> neighbours[3] = neighbours[3];
 
-  this -> grid_size[0] = grid_size[0];
-  this -> grid_size[1] = grid_size[1];
-
   this -> Nx = grid_size[0];
   this -> Ny = grid_size[1];
+
+
+  //this -> Nx = grid_size[0];
+  //this -> Ny = grid_size[1];
+
+  // Alter grid size to account for a shared row/column with every non-boundary edge.
+  if (neighbours[0] == -2 || neighbours[1] == -2) {Nx++;}
+  else {Nx+=2;}
+
+  if (neighbours[2] == -2 || neighbours[3] == -2) {Ny++;}
+  else {Ny+=2;}
 
   this -> dx = dx;
 
@@ -37,7 +45,9 @@ LidDrivenCavity::~LidDrivenCavity()
 
 void LidDrivenCavity::Test()
 {
-  cout << "I am a process, rank: " << rank << " and my neighbours are:" << neighbours[0] << neighbours[1] << neighbours[2] << neighbours[3] << endl;
+  cout << "(Rank" << rank << ") I have " << Nx << "x points and " << Ny << "y points" << " my neighbours are:" << neighbours[0] << neighbours[1] << neighbours[2] << neighbours[3] << endl;
+
+  //cout << "I am a process, rank: " << rank << " and my neighbours are:" << neighbours[0] << neighbours[1] << neighbours[2] << neighbours[3] << endl;
 }
 
 void LidDrivenCavity::SetDomainSize(double xlen, double ylen)
