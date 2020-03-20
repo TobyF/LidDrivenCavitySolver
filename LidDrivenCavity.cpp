@@ -25,6 +25,7 @@ LidDrivenCavity::LidDrivenCavity(MPI_Comm grid_comm, int rank, int neighbours[4]
   if (neighbours[2] == -2 || neighbours[3] == -2) {Ny++;}
   else {Ny+=2;}
 
+
   this -> dx = dx;
 
   this -> dy = dy;
@@ -117,9 +118,9 @@ void LidDrivenCavity::UpdateBoundaryConditions()
 void LidDrivenCavity::CalculateInteriorVorticity(){
   int i;
   int j;
-
-  for (i=1;i<Nx;i++){
-    for (j=1;j<Ny;j++){
+  // i =1 --> Nx -1 is to only calculate interior points
+  for (i=1;i<Nx-1;i++){
+    for (j=1;j<Ny-1;j++){
       v[i*Ny + j] = (s[(i-1)*Ny + j] - 2*s[i*Ny + j] + s[(i+1)*Ny + j])/pow(dx,2) + (s[i*Ny + j - 1] - 2*s[i*Ny + j] + s[i*Ny + j + 1]);
     }
   }
@@ -127,8 +128,10 @@ void LidDrivenCavity::CalculateInteriorVorticity(){
 
 void LidDrivenCavity::Integrate()
 {
+  //Sets the boundary values of vorticity based on current stream function (if attached to wall
   UpdateBoundaryConditions();
 
+  // Sets the interior vorticity values.
   CalculateInteriorVorticity();
 
 }
