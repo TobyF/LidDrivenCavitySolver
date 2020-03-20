@@ -69,9 +69,11 @@ void LidDrivenCavity::Initialise()
   this -> v_new = new double[grid_size[0]*grid_size[1]];
   this -> u_vel = new double[grid_size[0]*grid_size[1]];
   this -> v_vel = new double[grid_size[0]*grid_size[1]];
+}
 
-
-  // Set boundary conditions:
+void LidDrivenCavity::UpdateBoundaryConditions()
+{
+  // Step 1 - Set boundary conditions:
   // If this set of points has a boundary on an edge
   // set the boundary points as per the first equation step.
 
@@ -102,6 +104,18 @@ void LidDrivenCavity::Initialise()
   }
 }
 
+void LidDrivenCavity::CalculateInteriorVorticity(){
+  int i;
+  int j;
+
+  for (i=1;i<Nx;i++){
+    for (j=1;j<Ny;j++){
+      v[i*Ny + j] = (s[(i-1)*Ny + j] - 2*s[i*Ny + j] + s[(i+1)*Ny + j])/pow(dx,2) + (s[i*Ny + j - 1] - 2*s[i*Ny + j] + s[i*Ny + j + 1]);
+    }
+  }
+}
+
 void LidDrivenCavity::Integrate()
 {
+
 }

@@ -26,6 +26,9 @@ public:
     // Add any other public functions
 
 private:
+    void UpdateBoundaryConditions();
+    void CalculateInteriorVorticity();
+    
     double dt;
     double dy;
     double dx;
