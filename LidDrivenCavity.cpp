@@ -126,6 +126,20 @@ void LidDrivenCavity::CalculateInteriorVorticity(){
   }
 }
 
+void LidDrivenCavity::CalculateFutureInteriorVorticity(){
+  //This is a long equation which has been split into 3 partitions
+  double a;
+  double b;
+  //For interior points
+  for (i=1;i<Nx-1;i++){
+    for (j=1;j<Ny-1;j++){
+      a = (v[(i+1)*Ny +j]-v[(i-1)*Ny + j])*(s[i*Ny+j+1]-s[i*Ny+j-1])/(4*dx*dy);
+      b = (s[(i+1)*Ny +j]-s[(i-1)*Ny + j])*(v[i*Ny+j+1]-v[i*Ny+j-1])/(4*dx*dy);
+      v_new[i*Ny+j] = a+b+c
+    }
+  }
+}
+
 void LidDrivenCavity::Integrate()
 {
   //Sets the boundary values of vorticity based on current stream function (if attached to wall
@@ -133,5 +147,6 @@ void LidDrivenCavity::Integrate()
 
   // Sets the interior vorticity values.
   CalculateInteriorVorticity();
+
 
 }
