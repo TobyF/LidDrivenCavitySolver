@@ -128,14 +128,22 @@ void LidDrivenCavity::CalculateInteriorVorticity(){
 
 void LidDrivenCavity::CalculateFutureInteriorVorticity(){
   //This is a long equation which has been split into 3 partitions
+  //Details follow coursework handout
+
   double a;
   double b;
+  double rhs;
+  int i;
+  int j;
   //For interior points
   for (i=1;i<Nx-1;i++){
     for (j=1;j<Ny-1;j++){
       a = (v[(i+1)*Ny +j]-v[(i-1)*Ny + j])*(s[i*Ny+j+1]-s[i*Ny+j-1])/(4*dx*dy);
       b = (s[(i+1)*Ny +j]-s[(i-1)*Ny + j])*(v[i*Ny+j+1]-v[i*Ny+j-1])/(4*dx*dy);
-      v_new[i*Ny+j] = a+b+c
+      rhs = (1/Re)*((v[(i+1)*Ny+j] - 2*v[i*Ny+j] + v[(i-1)*Ny+j])/pow(dx,2) + (v[i*Ny+j+1] - 2*v[i*Ny+j] + v[i*Ny+j-1])/pow(dy,2));
+
+      v_new[i*Ny+j] = (rhs+b-a)*dt + v[i*Ny+j];
+
     }
   }
 }

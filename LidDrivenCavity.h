@@ -28,7 +28,8 @@ public:
 private:
     void UpdateBoundaryConditions();
     void CalculateInteriorVorticity();
-    
+    void CalculateFutureInteriorVorticity();
+
     double dt;
     double dy;
     double dx;
