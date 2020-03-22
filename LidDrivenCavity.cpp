@@ -148,6 +148,86 @@ void LidDrivenCavity::CalculateFutureInteriorVorticity(){
   }
 }
 
+void LidDrivenCavity::UpdateSharedInterfaces(){
+
+    int i;
+
+    //Horizontal
+    double send_left[Ny];
+    double send_right[Ny];
+    double recv_left[Ny];
+    double recv_right[Ny];
+
+
+    //Horizontal
+    if ((neighbours[0] != -2) && (neighbours[1] != -2)){ //no boundary on left or right
+      for (i=0;i<Ny;i++){
+        send_left[i] = v[Ny + i];
+        send_right[i] = v[(Nx-2)*Ny + i];
+      }
+
+      MPI_Sendrecv(&send_left, Ny, MPI_DOUBLE, neighbours[0], 0,
+                &recv_right, Ny , MPI_DOUBLE, neighbours[1], 0,
+                grid_comm,  MPI_STATUS_IGNORE);
+
+      MPI_Sendrecv(&send_right, Ny, MPI_DOUBLE, neighbours[1], 1,
+                &recv_left, Ny , MPI_DOUBLE, neighbours[0], 1,
+                grid_comm,  MPI_STATUS_IGNORE);
+    }
+    else if ((neighbours[0] != -2)){ //attached to right wall and left dree
+      MPI_Send(&send_left, Ny, MPI_DOUBLE, neighbours[0],0,grid_comm);
+      MPI_Recv(&recv_left, Ny, MPI_DOUBLE, neighbours[0],1,grid_comm, MPI_STATUS_IGNORE);
+
+    }
+    else{ //Attached to left wall
+      MPI_Recv(&recv_right, Ny, MPI_DOUBLE, neighbours[1],0,grid_comm, MPI_STATUS_IGNORE);
+      MPI_Send(&send_right, Ny, MPI_DOUBLE, neighbours[1],1,grid_comm);
+    }
+
+    //Unpack any recvievd files, updating the stored arrays
+    for (i=0;i<Ny;i++){
+        if (neighbours[0] != -2) { v[i] = recv_left[i];}
+        if (neighbours[1] != -2) {v[(Nx-1)*Ny + i] = recv_right[i];}
+    }
+
+    //Vertical
+    double send_up[Ny];
+    double send_down[Ny];
+    double recv_up[Ny];
+    double recv_down[Ny];
+
+    if ((neighbours[2] != -2) && (neighbours[3] != -2)){ //no boundary on left or right
+      for (i=0;i<Nx;i++){
+        send_down[i] = v[Ny*i+1]; //Second from bottom row
+        send_up[i] = v[Ny*(i+1)-2]; //Second to top row
+      }
+
+      MPI_Sendrecv(&send_down, Nx, MPI_DOUBLE, neighbours[2], 2,
+                &recv_up, Nx , MPI_DOUBLE, neighbours[3], 2,
+                grid_comm,  MPI_STATUS_IGNORE);
+
+      MPI_Sendrecv(&send_up, Nx, MPI_DOUBLE, neighbours[3], 3,
+                &recv_down, Nx , MPI_DOUBLE, neighbours[2], 3,
+                grid_comm,  MPI_STATUS_IGNORE);
+    }
+    else if ((neighbours[2] != -2)){ //attached to top lid
+      MPI_Send(&send_down, Nx, MPI_DOUBLE, neighbours[2],2,grid_comm);
+      MPI_Recv(&recv_down, Nx, MPI_DOUBLE, neighbours[3],3,grid_comm, MPI_STATUS_IGNORE);
+
+    }
+    else{ //Attached to bottom wall
+      MPI_Recv(&recv_up, Nx, MPI_DOUBLE, neighbours[3],2,grid_comm, MPI_STATUS_IGNORE);
+      MPI_Send(&send_up, Nx, MPI_DOUBLE, neighbours[2],3,grid_comm);
+    }
+
+    //Unpack any recvievd files, updating the stored arrays
+    for (i=0;i<Nx;i++){
+        if (neighbours[2] != -2) { v[Ny*i] = recv_down[i];}
+        if (neighbours[3] != -2) {v[Ny*(i+1)-1] = recv_up[i];}
+    }
+
+}
+
 void LidDrivenCavity::Integrate()
 {
   //Sets the boundary values of vorticity based on current stream function (if attached to wall
@@ -155,6 +235,11 @@ void LidDrivenCavity::Integrate()
 
   // Sets the interior vorticity values.
   CalculateInteriorVorticity();
+
+  // GET VORTICITY AT DOMAIN INTERFACES
+  UpdateSharedInterfaces();
+
+  CalculateFutureInteriorVorticity();
 
 
 }
