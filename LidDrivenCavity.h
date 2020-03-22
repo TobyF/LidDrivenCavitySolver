@@ -30,6 +30,7 @@ private:
     void CalculateInteriorVorticity();
     void CalculateFutureInteriorVorticity();
     void UpdateSharedInterfaces();
+    void PoissonSolver();
 
     double dt;
     double dy;
