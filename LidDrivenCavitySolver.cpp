@@ -125,6 +125,7 @@ int main(int argc, char* argv[])
 	 // Run the solver
 	solver->Integrate();
 
+	solver->Gather();
 
 	MPI_Finalize();
 	return 0;

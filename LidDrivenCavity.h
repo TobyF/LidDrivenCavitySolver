@@ -4,6 +4,7 @@
 #include <iostream>
 #include <mpi.h>
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
 
@@ -23,14 +24,16 @@ public:
     void Initialise();
     void Integrate();
     void Test();
+    void Gather();
     // Add any other public functions
 
 private:
     void UpdateBoundaryConditions();
     void CalculateInteriorVorticity();
     void CalculateFutureInteriorVorticity();
-    void UpdateSharedInterfaces();
+    void UpdateSharedInterfaces(double *field);
     void PoissonSolver();
+    void PrintField(double *field);
 
     double dt;
     double dy;
