@@ -242,9 +242,6 @@ void LidDrivenCavity::UpdateSharedInterfaces(double *field){
     //MPI_Barrier(grid_comm);
 }
 
-void LidDrivenCavity::PoissonSolver(){
-
-}
 
 void LidDrivenCavity::Gather(){
 
@@ -257,7 +254,7 @@ void LidDrivenCavity::Integrate()
   UpdateBoundaryConditions();
   MPI_Barrier(grid_comm);
 
-  if (rank == 0){
+  if (rank == 1){
     cout << rank << "Printing Vorticity:" << endl;
     PrintField(v);
   }
@@ -278,7 +275,9 @@ void LidDrivenCavity::Integrate()
 
   UpdateSharedInterfaces(v_new);
   if (rank == 0){cout << "Step 4: Solve for stream functions" << endl;}
-  PoissonSolver();
+  ParallelPoissonSolver* poisson = new ParallelPoissonSolver();
+  double temp;
+  temp = poisson->Solve();
 
 
 }

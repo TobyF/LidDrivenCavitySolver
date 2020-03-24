@@ -5,7 +5,7 @@
 #include <mpi.h>
 #include <cmath>
 #include <iomanip>
-
+#include "ParallelPoissonSolver.h"
 using namespace std;
 
 class LidDrivenCavity
@@ -32,7 +32,6 @@ private:
     void CalculateInteriorVorticity();
     void CalculateFutureInteriorVorticity();
     void UpdateSharedInterfaces(double *field);
-    void PoissonSolver();
     void PrintField(double *field);
 
     double dt;
