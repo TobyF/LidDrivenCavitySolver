@@ -265,7 +265,7 @@ void LidDrivenCavity::Integrate()
 
   UpdateSharedInterfaces(v_new);
   if (rank == 0){cout << "Step 4: Solve for stream functions" << endl;}
-  ParallelPoissonSolver* poisson = new ParallelPoissonSolver();
+  ParallelPoissonSolver* poisson = new ParallelPoissonSolver(v,dx,dy,Nx,Ny,rank,grid_comm);
   double temp;
   temp = poisson->Solve();
 
