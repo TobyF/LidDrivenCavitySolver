@@ -145,16 +145,6 @@ void LidDrivenCavity::CalculateFutureInteriorVorticity(){
   }
 }
 
-// Print a matrix
-void LidDrivenCavity::PrintField(double *F) {
-      for (int j = Ny-1; j > -1; --j) {
-        for (int i = 0; i < Nx; ++i) {
-            cout << setw(10) << F[i*Ny+j] << " ";
-        }
-        cout << endl;
-    }
-}
-
 void LidDrivenCavity::UpdateSharedInterfaces(double *field){
 
     int i;
@@ -256,7 +246,7 @@ void LidDrivenCavity::Integrate()
 
   if (rank == 1){
     cout << rank << "Printing Vorticity:" << endl;
-    PrintField(v);
+    printMatrixCM(v, Nx, Ny);
   }
 
   // Sets the interior vorticity values.

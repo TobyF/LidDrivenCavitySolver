@@ -5,6 +5,7 @@
 #include <mpi.h>
 #include <cmath>
 #include <iomanip>
+#include "matrix_print.h"
 
 using namespace std;
 
