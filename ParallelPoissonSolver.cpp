@@ -64,8 +64,8 @@ ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, doubl
 ParallelPoissonSolver::~ParallelPoissonSolver(){
 }
 
-double ParallelPoissonSolver::GetX(){
-  return *x;
+double* ParallelPoissonSolver::GetX(){
+  return x;
 
 }
 void ParallelPoissonSolver::Solve(){
