@@ -86,6 +86,7 @@ void ParallelPoissonSolver::Solve(){
   double eps;
   double tol = 0.00001;
 
+  for (int i = 0;i<A_width;++i){x[i] = 0.1;}
   cout << "x vector: " << endl;
   printMatrixRM(x,A_width,1);
 
