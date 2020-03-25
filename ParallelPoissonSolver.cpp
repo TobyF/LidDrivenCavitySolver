@@ -126,21 +126,6 @@ void ParallelPoissonSolver::Solve(){
 
       //AT THIS POINT - MPI SHOULD COMMUNICATE AND SHARE BOUNDARY DATA
 
-        for (int i = 0; i < ALimit; i++){
-    	if (i < Nxred){
-    		v[i] -= overDysqu*lowerBound[i];
-    	}
-    	if (i % Nxred == 0){
-    		v[i] -= overDxsqu*leftBound[i];
-    	}
-    	if (i % Nxred == Nxred-1){
-    		v[i] -= overDxsqu*rightBound[i];
-    	}
-    	if (i >= Nxred*(Nyred-1)){
-    		v[i] -= overDysqu*upperBound[i];
-    	}
-    }
-
       k++;
     } while (k < 200); // Set a maximum number of iterations
   cout << "Poisson solver finished after " << k << " iterations. eps: " << eps << endl;
