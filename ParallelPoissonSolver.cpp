@@ -1,7 +1,7 @@
 #include "ParallelPoissonSolver.h"
 
 ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, double dy, int Nx, int Ny, int rank, MPI_Comm grid_comm){
-  //Constructing A Matrix, row-major
+
   // b = v = [v11, v12, v13 ... v1(Ny-1), v21, v22....]'
 
   A_width = (Nx - 2)*(Ny-2);
@@ -15,6 +15,10 @@ ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, doubl
   double neg_recip_dx_sq = -1.0/dx_sq;
   double neg_recip_dy_sq = -1.0/dy_sq;
 
+  //Set initial x guess
+  for (int i = 0;i<A_width;++i){x[i] = 0.1;}
+
+  //Set A and B Matrix
   for (int i = 0;i<(Nx-2);++i){
     for (int j = 0; j<(Ny-2); ++j){
       // i,j represent the coordinate of the stream function for which the row (field address) represents
@@ -83,27 +87,24 @@ void ParallelPoissonSolver::Solve(){
   double tol = 0.00001;
 
 
-  for (int i = 0;i<A_width;++i){x[i] = 0.1;}
-  cout << "x vector: " << endl;
+
+  //cout << "x vector: " << endl;
   printMatrixRM(x,A_width,1);
 
   cblas_dcopy(A_width, b, 1, r, 1);        // r_0 = b (i.e. b)
   cblas_dsymv(CblasRowMajor, CblasUpper, A_width, -1.0, A, A_width, x, 1, 1.0, r, 1);  // r_0 = b - A x_0
-  cout << "r vector: " << endl;
-  printMatrixRM(r,A_width,1);
+  //cout << "r vector: " << endl;
+  //printMatrixRM(r,A_width,1);
   cblas_dcopy(A_width, r, 1, p, 1);        // p_0 = r_0
 
-  cout << "r vector: " << endl;
-  printMatrixRM(r,A_width,1);
+  //cout << "r vector: " << endl;
+  //printMatrixRM(r,A_width,1);
 
-  cout << "p vector: " << endl;
-  printMatrixRM(p,A_width,1);
+  //cout << "p vector: " << endl;
+  //printMatrixRM(p,A_width,1);
   k = 0;
   do {
       cblas_dsymv(CblasRowMajor, CblasUpper, A_width, 1.0, A, A_width, p, 1, 0.0, temp, 1); // temp= A p_k
-
-      //cout << "t vector: " << endl;
-      //printMatrixRM(temp,A_width,1);
 
       alpha = cblas_ddot(A_width, temp, 1, p, 1);  // alpha = p_k^T A p_k
       //cout << "alphav1: " << alpha << endl;
@@ -115,7 +116,7 @@ void ParallelPoissonSolver::Solve(){
       cblas_daxpy(A_width, -alpha, temp, 1, r, 1); // r_{k+1} = r_k - alpha_k A p_k
 
       eps = cblas_dnrm2(A_width, r, 1);
-      cout << "Iteration " << k << ": eps=" << eps << endl;
+      //cout << "Iteration " << k << ": eps=" << eps << endl;
       if (eps < tol*tol) {
           break;
       }
@@ -125,8 +126,9 @@ void ParallelPoissonSolver::Solve(){
       cblas_daxpy(A_width, beta, p, 1, temp, 1);
       cblas_dcopy(A_width, temp, 1, p, 1);
 
+      //AT THIS POINT - MPI SHOULD COMMUNICATE AND SHARE BOUNDARY DATA
       k++;
     } while (k < 5000); // Set a maximum number of iterations
-
+  cout << "Poisson solver finished after " << k << " iterations. eps: " << eps << endl;
   //printMatrixCM(x,A_width,1);
 }

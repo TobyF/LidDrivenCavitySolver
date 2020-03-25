@@ -122,8 +122,12 @@ int main(int argc, char* argv[])
 	// Configure the solver here...
 	solver->Initialise();
 
+	for (double t=0;t<=T;t+=dt){
+		cout << "t: " << t << endl;
+		solver->Integrate();
+	}
 	 // Run the solver
-	solver->Integrate();
+
 
 	solver->Gather();
 

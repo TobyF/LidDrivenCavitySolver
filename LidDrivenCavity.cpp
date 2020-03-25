@@ -242,7 +242,7 @@ void LidDrivenCavity::Integrate()
   if (rank == 0){cout << "Integrating..." << endl;}
   //Sets the boundary values of vorticity based on current stream function (if attached to wall
   UpdateBoundaryConditions();
-  MPI_Barrier(grid_comm);
+  //MPI_Barrier(grid_comm);
 
   if (rank == 1){
     cout << rank << "Printing Vorticity:" << endl;
@@ -252,16 +252,16 @@ void LidDrivenCavity::Integrate()
   // Sets the interior vorticity values.
   if (rank == 0){cout << "Step 2: Calculating Interior Vorticity" << endl;}
   CalculateInteriorVorticity();
-  MPI_Barrier(grid_comm);
+  //MPI_Barrier(grid_comm);
 
   // GET VORTICITY AT DOMAIN INTERFACES
   if (rank == 0){cout << "Update the shared boundary points" << endl;}
   UpdateSharedInterfaces(v);
-  MPI_Barrier(grid_comm);
+  //MPI_Barrier(grid_comm);
 
   if (rank == 0){cout << "Step 3: Calculate Future Interior Vorticity" << endl;}
   CalculateFutureInteriorVorticity();
-  MPI_Barrier(grid_comm);
+  //  MPI_Barrier(grid_comm);
 
   UpdateSharedInterfaces(v_new);
   if (rank == 0){cout << "Step 4: Solve for stream functions" << endl;}
@@ -285,7 +285,7 @@ void LidDrivenCavity::Integrate()
         }
     }
   }
-  
+
   printMatrixCM(s,Nx,Ny);
 
 }
