@@ -57,7 +57,7 @@ ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, doubl
   }
 
   cout << "Printing A Matrix:" << endl;
-  printMatrixRM(A,A_width,A_width)
+  printMatrixRM(A,A_width,A_width);
 
   cout << "Printing B Vector:" << endl;
   printMatrixRM(b,A_width,1);
