@@ -16,8 +16,10 @@ ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, doubl
   double neg_recip_dy_sq = -1.0/dy_sq;
 
   //Set initial x guess
+  cout << "Yo";
   for (int i = 0;i<A_width;++i){x[i] = 0.1;}
-
+  cout << "No";
+  
   //Set A and B Matrix
   for (int i = 0;i<(Nx-2);++i){
     for (int j = 0; j<(Ny-2); ++j){
