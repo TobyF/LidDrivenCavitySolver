@@ -272,7 +272,8 @@ void LidDrivenCavity::Integrate()
   //double* s_small[(Nx-2)*(Ny-2)];
   poisson->Solve();
   double* s_small = poisson->GetX();
-  printMatrixCM(s_small,(Nx-2)*(Ny-2),1);
+  cout << "Stream functions small:" << endl;
+  printMatrixCM(s_small,(Nx-2),*(Ny-2));
 
   //Unpack s_small into s
   for (int i = 0; i < Nx; ++i){
@@ -284,6 +285,8 @@ void LidDrivenCavity::Integrate()
           s[j+i*Ny] = s_small[(j-1)+(i-1)*(Ny-2)];
         }
     }
+    cout << "Stream functions big:" << endl;
+    printMatrixCM(s,Nx,Ny)
   }
 
 
