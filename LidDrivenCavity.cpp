@@ -89,25 +89,25 @@ void LidDrivenCavity::UpdateBoundaryConditions(){
   int i;
   if (neighbours[0] == -2){ //Top boundary
     for (i=1;i<=Nx;++i){
-      v[i*Ny-1] = 1; //(s[i*Ny-1]-s[i*Ny-2])*2/pow(dy,2) - 2*U/dy;
+      v[i*Ny-1] = (s[i*Ny-1]-s[i*Ny-2])*2/pow(dy,2) - 2*U/dy;
     }
   }
   // Bottom
   if (neighbours[1] == -2){
     for (i=0;i<Nx;++i){
-      v[Ny*i] = 2; //(s[Ny*i] - s[Ny*i+1])*2/pow(dy,2);
+      v[Ny*i] = (s[Ny*i] - s[Ny*i+1])*2/pow(dy,2);
     }
   }
   // Left
   if (neighbours[2] == -2){
     for (i=0;i<Ny;++i){
-      v[i] = 3; //(s[i] - s[Ny+i])*2/pow(dx,2);
+      v[i] = (s[i] - s[Ny+i])*2/pow(dx,2);
     }
   }
   // Right
   if (neighbours[3] == -2){
     for (i=0;i<Ny;++i){
-      v[(Nx-1)*Ny + i] = 4; //(s[i] - s[Ny+i])*2/pow(dx,2);
+      v[(Nx-1)*Ny + i] = (s[i] - s[Ny+i])*2/pow(dx,2);
     }
   }
 }
@@ -265,9 +265,11 @@ void LidDrivenCavity::Integrate()
 
   UpdateSharedInterfaces(v_new);
   if (rank == 0){cout << "Step 4: Solve for stream functions" << endl;}
+  cout << "Current vorticity field:" << endl;
+  printMatrixCM(v,Nx,Ny);
   ParallelPoissonSolver* poisson = new ParallelPoissonSolver(v,dx,dy,Nx,Ny,rank,grid_comm);
-  double temp;
-  temp = poisson->Solve();
+
+  poisson->Solve();
 
 
 }

@@ -16,9 +16,12 @@ public:
   ParallelPoissonSolver(double *v_intial, double dx, double dy, int Nx, int Ny, int rank, MPI_Comm grid_comm);
   ~ParallelPoissonSolver();
   void Solve();
+  double GetX();
+
 private:
-  double* v = nullptr;
   double* A = nullptr;
+  double* b = nullptr;
+  double* x = nullptr;
   double diag;
   double dx;
   double dy;
@@ -28,6 +31,7 @@ private:
   MPI_Comm grid_comm;
   int A_width;
   int A_total;
+
 
 
 };
