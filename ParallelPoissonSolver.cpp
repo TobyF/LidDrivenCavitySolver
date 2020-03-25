@@ -83,12 +83,14 @@ void ParallelPoissonSolver::Solve(){
   double alpha;
   double beta;
   double eps;
-  double tol = 0.00001;
+  double tol = 0.00001; //tolerance
 
   for (int i = 0;i<A_width;++i){x[i] = 0.1;}
   //cout << "x vector: " << endl;
   //printMatrixRM(x,A_width,1);
 
+
+  // ------ conjugate gradient method as used in class notes Ex 22.3. ---
   cblas_dcopy(A_width, b, 1, r, 1);        // r_0 = b (i.e. b)
   cblas_dsymv(CblasRowMajor, CblasUpper, A_width, -1.0, A, A_width, x, 1, 1.0, r, 1);  // r_0 = b - A x_0
   //cout << "r vector: " << endl;
@@ -100,6 +102,7 @@ void ParallelPoissonSolver::Solve(){
 
   //cout << "p vector: " << endl;
   //printMatrixRM(p,A_width,1);
+
   k = 0;
   do {
       cblas_dsymv(CblasRowMajor, CblasUpper, A_width, 1.0, A, A_width, p, 1, 0.0, temp, 1); // temp= A p_k
