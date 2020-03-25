@@ -25,8 +25,7 @@ public:
     void Integrate();
     void Test();
     void Gather();
-    // Add any other public functions
-
+    
 private:
     void UpdateBoundaryConditions();
     void CalculateInteriorVorticity();

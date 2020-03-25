@@ -1,7 +1,5 @@
 #include <iostream>
-
-//Multi-Process Interface
-#include <mpi.h>
+#include <mpi.h> //Multi-Process Interface
 
 using namespace std;
 
@@ -14,7 +12,7 @@ namespace po = boost::program_options;
 
 int main(int argc, char* argv[])
 {
-	//Get command line arguments
+	//Get command line arguments, default values can be set here.
 	po::options_description desc("Allowed options");
   desc.add_options()
       ("help", "Produce help message")
@@ -30,10 +28,12 @@ int main(int argc, char* argv[])
 
   ;
 
+	// argument mapping from command line
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);
 
+	// help function
   if (vm.count("help")) {
       cout << desc << "\n";
       return 0;
@@ -73,9 +73,6 @@ int main(int argc, char* argv[])
 	MPI_Comm_rank(MPI_COMM_WORLD, &global_rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &process_count);
 
-	//Display a message from each process
-	//cout << "Yo! I am a process and my global rank is:" << global_rank <<" of the " << process_count << endl;
-
 	// Sort out grid and parallelisms
 
 	MPI_Comm domain_grid; //Define a communicator for the grid
@@ -94,13 +91,9 @@ int main(int argc, char* argv[])
 	MPI_Comm_rank(domain_grid, &grid_rank); //Get rank in grid
 	MPI_Cart_coords(domain_grid, grid_rank, dims, coords); //Get coordinated n grid
 
-	//cout << "I am rank" << grid_rank <<" and I live at coords:" << coords[0] << coords[1] << endl;
-
 	int neighbours[4] = {grid_rank, grid_rank, grid_rank, grid_rank};
   MPI_Cart_shift(domain_grid, 0, 1, &neighbours[0], &neighbours[1]);
   MPI_Cart_shift(domain_grid, 1, 1, &neighbours[2], &neighbours[3]);
-
-	//for (int i = 0; i<4; i++) cout << neighbours[i] << endl;
 
 	// Calculate gridding - tries to evenely distribute grid points.
 	int grid_points[dims];
@@ -116,19 +109,15 @@ int main(int argc, char* argv[])
 	// Create a new instance of the LidDrivenCavity class
 	LidDrivenCavity* solver = new LidDrivenCavity(domain_grid, grid_rank, neighbours, grid_points, dx, dy, dt, T, Re);
 
-	// Print test
-	solver->Test();
-
 	// Configure the solver here...
 	solver->Initialise();
 
+	// For each timestep, integrate forwards
 	for (double t=0;t<=T;t+=dt){
 		cout << "t: " << t << endl;
 		solver->Integrate();
 	}
-	 // Run the solver
-
-
+	// After gather all points together, this could then be sent to a fiel or processed futher.
 	solver->Gather();
 
 	MPI_Finalize();

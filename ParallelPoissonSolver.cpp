@@ -1,24 +1,24 @@
 #include "ParallelPoissonSolver.h"
 
 ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, double dy, int Nx, int Ny, int rank, MPI_Comm grid_comm){
-
   // b = v = [v11, v12, v13 ... v1(Ny-1), v21, v22....]'
+
   A_width = (Nx - 2)*(Ny-2);
   A_total = A_width*A_width;
+
   A = new double[A_total];
   b = new double[A_width];
   x = new double[A_width];
+
+  //Pre-compute for time saving
   double dx_sq = dx*dx;
   double dy_sq = dy*dy;
-
   double diag = 2.0/dx_sq + 2.0/dy_sq;
   double neg_recip_dx_sq = -1.0/dx_sq;
   double neg_recip_dy_sq = -1.0/dy_sq;
 
-  //Set initial x guess
-  cout << "Yo"<<endl;
+  //Set initial x guess (cannot be 0)
   for (int i = 0;i<A_width;++i){x[i] = 0.1;}
-  cout << "No"<<endl;
 
   //Set A and B Matrix
   for (int i = 0;i<(Nx-2);++i){
@@ -55,15 +55,14 @@ ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, doubl
       b[i*(Ny-2)+j] = v_initial[(i+1)*(Ny)+(j+1)];
     }
   }
-  cout << "Printing A Matrix:" << endl;
-  printMatrixRM(A,A_width,A_width);
 
-  // Generate b matrix:
-  //b = v_initial;
+  cout << "Printing A Matrix:" << endl;
+  printMatrixRM(A,A_width,A_width)
+
   cout << "Printing B Vector:" << endl;
   printMatrixRM(b,A_width,1);
 
-  x = new double[A_width];
+  //x = new double[A_width];
 }
 
 
@@ -126,6 +125,22 @@ void ParallelPoissonSolver::Solve(){
       cblas_dcopy(A_width, temp, 1, p, 1);
 
       //AT THIS POINT - MPI SHOULD COMMUNICATE AND SHARE BOUNDARY DATA
+
+        for (int i = 0; i < ALimit; i++){
+    	if (i < Nxred){
+    		v[i] -= overDysqu*lowerBound[i];
+    	}
+    	if (i % Nxred == 0){
+    		v[i] -= overDxsqu*leftBound[i];
+    	}
+    	if (i % Nxred == Nxred-1){
+    		v[i] -= overDxsqu*rightBound[i];
+    	}
+    	if (i >= Nxred*(Nyred-1)){
+    		v[i] -= overDysqu*upperBound[i];
+    	}
+    }
+
       k++;
     } while (k < 200); // Set a maximum number of iterations
   cout << "Poisson solver finished after " << k << " iterations. eps: " << eps << endl;

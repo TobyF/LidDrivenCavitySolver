@@ -2,6 +2,7 @@
 
 LidDrivenCavity::LidDrivenCavity(MPI_Comm grid_comm, int rank, int neighbours[4], int grid_size[2], double dx, double dy, double dt, double T, double Re)
 {
+  //retrieve all class constructor arguments to store in class variables
   this -> grid_comm = grid_comm;
 
   this -> rank = rank;
@@ -13,10 +14,6 @@ LidDrivenCavity::LidDrivenCavity(MPI_Comm grid_comm, int rank, int neighbours[4]
 
   this -> Nx = grid_size[0];
   this -> Ny = grid_size[1];
-
-
-  //this -> Nx = grid_size[0];
-  //this -> Ny = grid_size[1];
 
   // Alter grid size to account for a shared row/column with every non-boundary edge.
   if (neighbours[0] != -2) {++Nx;}
@@ -267,25 +264,31 @@ void LidDrivenCavity::Integrate()
   if (rank == 0){cout << "Step 4: Solve for stream functions" << endl;}
   cout << "Current vorticity field:" << endl;
   printMatrixCM(v,Nx,Ny);
+
+  //I should not have to make a new instance with each Solve() run. Should be moved out.
   ParallelPoissonSolver* poisson = new ParallelPoissonSolver(v,dx,dy,Nx,Ny,rank,grid_comm);
 
-  //double* s_small[(Nx-2)*(Ny-2)];
+  //Runs iterative conjugate gradient method.
   poisson->Solve();
+
+  // Retrieve the solutiom, in this case streamfunctions.
   double* s_small = poisson->GetX();
+  // Display them.
   printMatrixCM(s_small,(Nx-2),(Ny-2));
 
   //Unpack s_small into s
   for (int i = 0; i < Nx; ++i){
     for (int j = 0; j < Ny; ++j){
-        if (i==0 || i==(Nx-1) || j==0 || j==(Ny-1)){
+        if (i==0 || i==(Nx-1) || j==0 || j==(Ny-1)){ //if on the boundary replace with 0 for now.
           s[j+i*Ny] = 0;
         }
         else{
-          s[j+i*Ny] = s_small[(j-1)+(i-1)*(Ny-2)];
+          s[j+i*Ny] = s_small[(j-1)+(i-1)*(Ny-2)]; // else insert solution.
         }
     }
   }
 
+  cout << "Stream function matrix:" << endl;
   printMatrixCM(s,Nx,Ny);
 
 }
