@@ -269,14 +269,14 @@ void LidDrivenCavity::Integrate()
   printMatrixCM(v,Nx,Ny);
   ParallelPoissonSolver* poisson = new ParallelPoissonSolver(v,dx,dy,Nx,Ny,rank,grid_comm);
 
-  double s_small[(Nx-2)*(Ny-2)];
+  double* s_small[(Nx-2)*(Ny-2)];
   poisson->Solve();
   s_small = poisson->GetX();
-  printMatrixCM(v_small,(Nx-2)*(Ny-2),1);
+  printMatrixCM(s_small,(Nx-2)*(Ny-2),1);
 
   //Unpack s_small into s
   for (int i = 0; i < Nx; ++i){
-    for (int j = 0; j < Ny; ++){
+    for (int j = 0; j < Ny; ++j){
         if (i==0 || i==(Nx-1) || j==0 || j=(Ny-1)){
           s[j+i*Ny] = 0;
         }
