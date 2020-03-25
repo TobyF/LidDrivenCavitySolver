@@ -64,7 +64,11 @@ ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, doubl
 ParallelPoissonSolver::~ParallelPoissonSolver(){
 }
 
+<<<<<<< HEAD
 double* ParallelPoissonSolver::GetX(){
+=======
+double ParallelPoissonSolver::GetX(){
+>>>>>>> 3cd712f99b7ccdeecc668b09844ef0aaa22e0ee9
   return x;
 
 }
