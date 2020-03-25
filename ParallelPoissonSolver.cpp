@@ -3,11 +3,11 @@
 ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, double dy, int Nx, int Ny, int rank, MPI_Comm grid_comm){
 
   // b = v = [v11, v12, v13 ... v1(Ny-1), v21, v22....]'
-  cout << "Yo" <<endl;
   A_width = (Nx - 2)*(Ny-2);
   A_total = A_width*A_width;
   A = new double[A_total];
   b = new double[A_width];
+  x = new double[A_width];
   double dx_sq = dx*dx;
   double dy_sq = dy*dy;
 
@@ -91,7 +91,7 @@ void ParallelPoissonSolver::Solve(){
 
 
   //cout << "x vector: " << endl;
-  printMatrixRM(x,A_width,1);
+  //printMatrixRM(x,A_width,1);
 
   cblas_dcopy(A_width, b, 1, r, 1);        // r_0 = b (i.e. b)
   cblas_dsymv(CblasRowMajor, CblasUpper, A_width, -1.0, A, A_width, x, 1, 1.0, r, 1);  // r_0 = b - A x_0
