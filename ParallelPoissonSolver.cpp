@@ -127,7 +127,7 @@ void ParallelPoissonSolver::Solve(){
 
       //AT THIS POINT - MPI SHOULD COMMUNICATE AND SHARE BOUNDARY DATA
       k++;
-    } while (k < 5000); // Set a maximum number of iterations
+    } while (k < 200); // Set a maximum number of iterations
   cout << "Poisson solver finished after " << k << " iterations. eps: " << eps << endl;
   //printMatrixCM(x,A_width,1);
 }
