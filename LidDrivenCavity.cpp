@@ -270,8 +270,8 @@ void LidDrivenCavity::Integrate()
   ParallelPoissonSolver* poisson = new ParallelPoissonSolver(v,dx,dy,Nx,Ny,rank,grid_comm);
 
   double s_small[(Nx-2)*(Ny-2)];
-  s_small = poisson->Solve();
-
+  poisson->Solve();
+  s_small = poisson->GetX();
   printMatrixCM(v_small,(Nx-2)*(Ny-2),1);
 
   //Unpack s_small into s
