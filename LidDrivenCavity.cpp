@@ -274,7 +274,7 @@ void LidDrivenCavity::Integrate()
   // Retrieve the solutiom, in this case streamfunctions.
   double* s_small = poisson->GetX();
   // Display them.
-  printMatrixCM(s_small,(Nx-2),(Ny-2));
+  // printMatrixCM(s_small,(Nx-2),(Ny-2));
 
   //Unpack s_small into s
   for (int i = 0; i < Nx; ++i){
@@ -288,7 +288,7 @@ void LidDrivenCavity::Integrate()
     }
   }
 
-  cout << "Stream function matrix:" << endl;
+  cout << "Stream function grid:" << endl;
   printMatrixCM(s,Nx,Ny);
 
 }
