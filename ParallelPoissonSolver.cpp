@@ -3,7 +3,7 @@
 ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, double dy, int Nx, int Ny, int rank, MPI_Comm grid_comm){
 
   // b = v = [v11, v12, v13 ... v1(Ny-1), v21, v22....]'
-
+  cout << "Yo" <<endl;
   A_width = (Nx - 2)*(Ny-2);
   A_total = A_width*A_width;
   A = new double[A_total];
@@ -16,10 +16,10 @@ ParallelPoissonSolver::ParallelPoissonSolver(double *v_initial, double dx, doubl
   double neg_recip_dy_sq = -1.0/dy_sq;
 
   //Set initial x guess
-  cout << "Yo";
+  cout << "Yo"<<endl;
   for (int i = 0;i<A_width;++i){x[i] = 0.1;}
-  cout << "No";
-  
+  cout << "No"<<endl;
+
   //Set A and B Matrix
   for (int i = 0;i<(Nx-2);++i){
     for (int j = 0; j<(Ny-2); ++j){
