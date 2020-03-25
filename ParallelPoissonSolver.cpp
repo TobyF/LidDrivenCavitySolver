@@ -86,13 +86,13 @@ void ParallelPoissonSolver::Solve(){
   double tol = 0.00001;
 
   for (int i = 0;i<A_width;++i){x[i] = 0.1;}
-  cout << "x vector: " << endl;
-  printMatrixRM(x,A_width,1);
+  //cout << "x vector: " << endl;
+  //printMatrixRM(x,A_width,1);
 
   cblas_dcopy(A_width, b, 1, r, 1);        // r_0 = b (i.e. b)
   cblas_dsymv(CblasRowMajor, CblasUpper, A_width, -1.0, A, A_width, x, 1, 1.0, r, 1);  // r_0 = b - A x_0
-  cout << "r vector: " << endl;
-  printMatrixRM(r,A_width,1);
+  //cout << "r vector: " << endl;
+  //printMatrixRM(r,A_width,1);
   cblas_dcopy(A_width, r, 1, p, 1);        // p_0 = r_0
 
   //cout << "r vector: " << endl;
@@ -105,7 +105,7 @@ void ParallelPoissonSolver::Solve(){
       cblas_dsymv(CblasRowMajor, CblasUpper, A_width, 1.0, A, A_width, p, 1, 0.0, temp, 1); // temp= A p_k
 
       alpha = cblas_ddot(A_width, temp, 1, p, 1);  // alpha = p_k^T A p_k
-      cout << "alphav1: " << alpha << endl;
+      //cout << "alphav1: " << alpha << endl;
       alpha = cblas_ddot(A_width, r, 1, r, 1) / alpha; // compute alpha_k
       //cout << "alphav2: " << alpha << endl;
       beta  = cblas_ddot(A_width, r, 1, r, 1);  // r_k^T r_k
