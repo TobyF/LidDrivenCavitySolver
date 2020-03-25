@@ -128,5 +128,5 @@ void ParallelPoissonSolver::Solve(){
       k++;
     } while (k < 5000); // Set a maximum number of iterations
 
-  printMatrixCM(x,A_width,1);
+  //printMatrixCM(x,A_width,1);
 }
