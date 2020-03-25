@@ -80,23 +80,19 @@ void ParallelPoissonSolver::Solve(){
   double* p = new double[A_width];
   double* temp = new double[A_width];
 
-
-
   int k;
   double alpha;
   double beta;
   double eps;
   double tol = 0.00001;
 
-
-
-  //cout << "x vector: " << endl;
-  //printMatrixRM(x,A_width,1);
+  cout << "x vector: " << endl;
+  printMatrixRM(x,A_width,1);
 
   cblas_dcopy(A_width, b, 1, r, 1);        // r_0 = b (i.e. b)
   cblas_dsymv(CblasRowMajor, CblasUpper, A_width, -1.0, A, A_width, x, 1, 1.0, r, 1);  // r_0 = b - A x_0
-  //cout << "r vector: " << endl;
-  //printMatrixRM(r,A_width,1);
+  cout << "r vector: " << endl;
+  printMatrixRM(r,A_width,1);
   cblas_dcopy(A_width, r, 1, p, 1);        // p_0 = r_0
 
   //cout << "r vector: " << endl;
